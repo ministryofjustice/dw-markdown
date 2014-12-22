@@ -766,7 +766,7 @@ class Markdown_Parser {
 		#	  Header 2
 		#	  --------
 		#
-		$text = preg_replace_callback('{ ^(.+?)[ ]*\n(=+|-+)[ ]*\n+ }mx',
+		$text = preg_replace_callback('{ ^(.+?)[ ]*\n(-+)[ ]*\n+ }mx',
 			array(&$this, '_doHeaders_callback_setext'), $text);
 
 		# atx-style headers:
@@ -777,7 +777,7 @@ class Markdown_Parser {
 		#	###### Header 6
 		#
 		$text = preg_replace_callback('{
-				^(\#{1,6})	# $1 = string of #\'s
+				^(\#{2,6})	# $1 = string of #\'s
 				[ ]*
 				(.+?)		# $2 = Header text
 				[ ]*
@@ -2467,7 +2467,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			'{
 				(^.+?)								# $1: Header text
 				(?:[ ]+ '.$this->id_class_attr_catch_re.' )?	 # $3 = id/class attributes
-				[ ]*\n(=+|-+)[ ]*\n+				# $3: Header footer
+				[ ]*\n(-+)[ ]*\n+				# $3: Header footer
 			}mx',
 			array(&$this, '_doHeaders_callback_setext'), $text);
 
@@ -2479,7 +2479,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 		#	###### Header 6   {.class2}
 		#
 		$text = preg_replace_callback('{
-				^(\#{1,6})	# $1 = string of #\'s
+				^(\#{2,6})	# $1 = string of #\'s
 				[ ]*
 				(.+?)		# $2 = Header text
 				[ ]*
