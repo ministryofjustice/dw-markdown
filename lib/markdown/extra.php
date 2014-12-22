@@ -811,9 +811,10 @@ class Markdown_Parser {
 		$less_than_tab = $this->tab_width - 1;
 
 		# Re-usable patterns to match list item bullets and number markers:
-		$marker_ul_re  = '[*+-]';
-		$marker_ol_re  = '\d+[\.]';
-		$marker_any_re = "(?:$marker_ul_re|$marker_ol_re)";
+		$marker_ul_re    = '[*+-]';
+		$marker_steps_re = '[s]\d+\.';
+		$marker_ol_re    = '\d+[\.]|'.$marker_steps_re;
+		$marker_any_re   = "(?:$marker_ul_re|$marker_ol_re)";
 
 		$markers_relist = array(
 			$marker_ul_re => $marker_ol_re,
@@ -872,19 +873,21 @@ class Markdown_Parser {
 	}
 	function _doLists_callback($matches) {
 		# Re-usable patterns to match list item bullets and number markers:
-		$marker_ul_re  = '[*+-]';
-		$marker_ol_re  = '\d+[\.]';
-		$marker_any_re = "(?:$marker_ul_re|$marker_ol_re)";
+		$marker_ul_re    = '[*+-]';
+		$marker_steps_re = '[s]\d+\.';
+		$marker_ol_re    = '\d+[\.]|'.$marker_steps_re;
+		$marker_any_re   = "(?:$marker_ul_re|$marker_ol_re)";
 
 		$list = $matches[1];
 		$list_type = preg_match("/$marker_ul_re/", $matches[4]) ? "ul" : "ol";
+		$list_class = preg_match("/$marker_steps_re/", $matches[4]) ? "steps" : "";
 
 		$marker_any_re = ( $list_type == "ul" ? $marker_ul_re : $marker_ol_re );
 
 		$list .= "\n";
 		$result = $this->processListItems($list, $marker_any_re);
 
-		$result = $this->hashBlock("<$list_type>\n" . $result . "</$list_type>");
+		$result = $this->hashBlock("<$list_type class='$list_class'>\n" . $result . "</$list_type>");
 		return "\n". $result ."\n\n";
 	}
 
