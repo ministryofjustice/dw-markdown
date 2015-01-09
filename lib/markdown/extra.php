@@ -558,6 +558,40 @@ class Markdown_Parser {
 			array(&$this, '_doAnchors_reference_callback'), $text);
 
 		#
+		# Next, download links: 
+		# $D
+		# [link text](url "optional title")
+		# $D
+		#
+		$text = preg_replace_callback('{
+			(				# wrap whole match in $1
+				\$D
+				[ \n]*
+			  \[
+				('.$this->nested_brackets_re.')	# link text = $2
+			  \]
+			  \(			# literal paren
+				[ \n]*
+				(?:
+					<(.+?)>	# href = $3
+				|
+					('.$this->nested_url_parenthesis_re.')	# href = $4
+				)
+				[ \n]*
+				(			# $5
+				  ([\'"])	# quote char = $6
+				  (.*?)		# Title = $7
+				  \6		# matching quote
+				  [ \n]*	# ignore any spaces/tabs between closing quote and )
+				)?			# title is optional
+			  \)
+				[ \n]*
+				\$D
+			)
+			}xs',
+			array(&$this, '_doAnchors_inline_link_callback'), $text);
+
+		#
 		# Next, inline-style links: [link text](url "optional title")
 		#
 		$text = preg_replace_callback('{
@@ -654,7 +688,26 @@ class Markdown_Parser {
 
 		return $this->hashPart($result);
 	}
+	function _doAnchors_inline_link_callback($matches) {
 
+		$whole_match	=  $matches[1];
+		$link_text		=  $this->runSpanGamut($matches[2]);
+		$url			=  $matches[3] == '' ? $matches[4] : $matches[3];
+		$title			=& $matches[7];
+
+		$url = $this->encodeAttribute($url);
+
+		$result = "<div class=\"form-download\"><p><a href=\"$url\"";
+		if (isset($title)) {
+			$title = $this->encodeAttribute($title);
+			$result .=  " title=\"$title\"";
+		}
+
+		$link_text = $this->runSpanGamut($link_text);
+		$result .= ">$link_text</a></p></div>";
+
+		return $this->hashPart($result);
+	}
 
 	function doImages($text) {
 	#
@@ -2243,6 +2296,35 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			}xs',
 			array(&$this, '_doAnchors_reference_callback'), $text);
 
+		# Download links
+		$text = preg_replace_callback('{
+			(				# wrap whole match in $1
+				\$D
+				[ \n]*
+			  \[
+				('.$this->nested_brackets_re.')	# link text = $2
+			  \]
+			  \(			# literal paren
+				[ \n]*
+				(?:
+					<(.+?)>	# href = $3
+				|
+					('.$this->nested_url_parenthesis_re.')	# href = $4
+				)
+				[ \n]*
+				(			# $5
+				  ([\'"])	# quote char = $6
+				  (.*?)		# Title = $7
+				  \6		# matching quote
+				  [ \n]*	# ignore any spaces/tabs between closing quote and )
+				)?			# title is optional
+			  \)
+				[ \n]*
+				\$D
+			)
+			}xs',
+			array(&$this, '_doAnchors_inline_link_callback'), $text);
+
 		#
 		# Next, inline-style links: [link text](url "optional title")
 		#
@@ -2343,6 +2425,28 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 
 		$link_text = $this->runSpanGamut($link_text);
 		$result .= ">$link_text</a>";
+
+		return $this->hashPart($result);
+	}
+	function _doAnchors_inline_link_callback($matches) {
+		$whole_match	=  $matches[1];
+		$link_text		=  $this->runSpanGamut($matches[2]);
+		$url			=  $matches[3] == '' ? $matches[4] : $matches[3];
+		$title			=& $matches[7];
+		$attr  = $this->doExtraAttributes("a", $dummy =& $matches[8]);
+
+
+		$url = $this->encodeAttribute($url);
+
+		$result = "<div class=\"form-download\"><p><a href=\"$url\"";
+		if (isset($title)) {
+			$title = $this->encodeAttribute($title);
+			$result .=  " title=\"$title\"";
+		}
+		$result .= $attr;
+
+		$link_text = $this->runSpanGamut($link_text);
+		$result .= ">$link_text</a></p></div>";
 
 		return $this->hashPart($result);
 	}
