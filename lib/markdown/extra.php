@@ -434,6 +434,13 @@ class Markdown_Parser {
 		"doLists"           => 40,
 		"doCodeBlocks"      => 50,
 		"doBlockQuotes"     => 60,
+
+		"doInfoCallout"     => 70,
+		"doWarningCallout"  => 72,
+		"doExampleCallout"  => 74,
+		"doAnswerCallout"   => 76,
+		"doContactCallout"  => 78,
+		"doAddressCallout"  => 79,
 		);
 
 	function runBlockGamut($text) {
@@ -1250,6 +1257,204 @@ class Markdown_Parser {
 		return "\n". $this->hashBlock("<blockquote>\n$bq\n</blockquote>")."\n\n";
 	}
 	function _doBlockQuotes_callback2($matches) {
+		$pre = $matches[1];
+		$pre = preg_replace('/^  /m', '', $pre);
+		return $pre;
+	}
+
+	function doInfoCallout($text) {
+		$text = preg_replace_callback('/
+			  (								# Wrap whole match in $1
+					^\^
+						(.+)
+					\^$
+			  )
+			/xm',
+			array(&$this, '_doInfoCallout_callback'), $text);
+
+		return $text;
+	}
+	function _doInfoCallout_callback($matches) {
+		$bq = $matches[1];
+
+		# trim one level of quoting - trim whitespace-only lines
+		$bq = preg_replace('/^\^|\^$/', '', $bq);
+
+		$bq = preg_replace('/^/m', "  ", $bq); 
+		# These leading spaces cause problem with <pre> content,
+		# so we need to fix that:
+		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
+			array(&$this, '_doInfoCallout_callback2'), $bq);
+
+		return "\n". $this->hashBlock("<div role=\"note\" aria-label=\"Information\" class=\"application-notice info-notice\">\n$bq\n</div>")."\n\n";
+	}
+	function _doInfoCallout_callback2($matches) {
+		$pre = $matches[1];
+		$pre = preg_replace('/^  /m', '', $pre);
+		return $pre;
+	}
+
+	function doWarningCallout($text) {
+		$text = preg_replace_callback('/
+			  (								# Wrap whole match in $1
+					^%
+						(.+)
+					%$
+			  )
+			/xm',
+			array(&$this, '_doWarningCallout_callback'), $text);
+
+		return $text;
+	}
+	function _doWarningCallout_callback($matches) {
+		$bq = $matches[1];
+
+		# trim one level of quoting - trim whitespace-only lines
+		$bq = preg_replace('/^%|%$/', '', $bq);
+
+		$bq = preg_replace('/^/m', "  ", $bq); 
+		# These leading spaces cause problem with <pre> content,
+		# so we need to fix that:
+		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
+			array(&$this, '_doWarningCallout_callback2'), $bq);
+
+		return "\n". $this->hashBlock("<div role=\"note\" aria-label=\"Help\" class=\"application-notice help-notice\">\n$bq\n</div>")."\n\n";
+	}
+	function _doWarningCallout_callback2($matches) {
+		$pre = $matches[1];
+		$pre = preg_replace('/^  /m', '', $pre);
+		return $pre;
+	}
+
+	function doExampleCallout($text) {
+		$text = preg_replace_callback('/
+			  (								# Wrap whole match in $1
+					^\$E
+						\n
+							(.+)
+						\n
+					\$E$
+			  )
+			/xm',
+			array(&$this, '_doExampleCallout_callback'), $text);
+
+		return $text;
+	}
+	function _doExampleCallout_callback($matches) {
+		$bq = $matches[1];
+
+		# trim one level of quoting - trim whitespace-only lines
+		$bq = preg_replace('/^\$E|\$E$/', '', $bq);
+$bq = $this->runBlockGamut($bq);		# recurse
+		$bq = preg_replace('/^/m', "  ", $bq); 
+		# These leading spaces cause problem with <pre> content,
+		# so we need to fix that:
+		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
+			array(&$this, '_doExampleCallout_callback2'), $bq);
+
+		return "\n". $this->hashBlock("<div class=\"example\">\n$bq\n</div>")."\n\n";
+	}
+	function _doExampleCallout_callback2($matches) {
+		$pre = $matches[1];
+		$pre = preg_replace('/^  /m', '', $pre);
+		return $pre;
+	}
+
+	function doAnswerCallout($text) {
+		$text = preg_replace_callback('/
+			  (								# Wrap whole match in $1
+					^\$!
+						(.+)
+					\$!$
+			  )
+			/xm',
+			array(&$this, '_doAnswerCallout_callback'), $text);
+
+		return $text;
+	}
+	function _doAnswerCallout_callback($matches) {
+		$bq = $matches[1];
+
+		# trim one level of quoting - trim whitespace-only lines
+		$bq = preg_replace('/^\$!|\$!$/', '', $bq);
+		$bq = $this->runBlockGamut($bq);		# recurse
+		$bq = preg_replace('/^/m', "  ", $bq); 
+		# These leading spaces cause problem with <pre> content,
+		# so we need to fix that:
+		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
+			array(&$this, '_doAnswerCallout_callback2'), $bq);
+
+		return "\n". $this->hashBlock("<div class=\"summary\">\n$bq\n</div>")."\n\n";
+	}
+	function _doAnswerCallout_callback2($matches) {
+		$pre = $matches[1];
+		$pre = preg_replace('/^  /m', '', $pre);
+		return $pre;
+	}
+
+	function doContactCallout($text) {
+		$text = preg_replace_callback('/
+			  (								# Wrap whole match in $1
+					^\$C
+						\n
+							((.+\n?)+)
+						\n
+					\$C$
+			  )
+			/xm',
+			array(&$this, '_doContactCallout_callback'), $text);
+
+		return $text;
+	}
+	function _doContactCallout_callback($matches) {
+		$bq = $matches[1];
+
+		# trim one level of quoting - trim whitespace-only lines
+		$bq = preg_replace('/^\$C|\$C$/', '', $bq);
+		$bq = $this->runBlockGamut($bq);		# recurse
+		$bq = preg_replace('/^/m', "  ", $bq); 
+		# These leading spaces cause problem with <pre> content,
+		# so we need to fix that:
+		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
+			array(&$this, '_doContactCallout_callback2'), $bq);
+
+		return "\n". $this->hashBlock("<div class=\"contact\">\n$bq\n</div>")."\n\n";
+	}
+	function _doContactCallout_callback2($matches) {
+		$pre = $matches[1];
+		$pre = preg_replace('/^  /m', '', $pre);
+		return $pre;
+	}
+
+	function doAddressCallout($text) {
+		$text = preg_replace_callback('/
+			  (								# Wrap whole match in $1
+					^\$A
+						\n
+							((.+\n?)+)
+						\n
+					\$A$
+			  )
+			/xm',
+			array(&$this, '_doAddressCallout_callback'), $text);
+
+		return $text;
+	}
+	function _doAddressCallout_callback($matches) {
+		$bq = $matches[1];
+
+		# trim one level of quoting - trim whitespace-only lines
+		$bq = preg_replace('/^\$A|\$A$/', '', $bq);
+		$bq = $this->runBlockGamut($bq);		# recurse
+		$bq = preg_replace('/^/m', "  ", $bq); 
+		# These leading spaces cause problem with <pre> content,
+		# so we need to fix that:
+		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
+			array(&$this, '_doAddressCallout_callback2'), $bq);
+
+		return "\n". $this->hashBlock("<div class=\"address\"><div class=\"adr org fn\">\n$bq\n</div></div>")."\n\n";
+	}
+	function _doAddressCallout_callback2($matches) {
 		$pre = $matches[1];
 		$pre = preg_replace('/^  /m', '', $pre);
 		return $pre;
