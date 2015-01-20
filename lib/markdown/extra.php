@@ -49,6 +49,7 @@ define( 'MARKDOWNEXTRA_VERSION',  "1.2.8" ); # 29 Nov 2013
 @define( 'MARKDOWN_PARSER_CLASS',  'MarkdownExtra_Parser' );
 
 function Markdown($text) {
+	echo($text);exit;
 #
 # Initialize the parser and return the result of its transform method.
 #
@@ -660,6 +661,9 @@ class Markdown_Parser {
 			$url = $this->urls[$link_id];
 			$url = $this->encodeAttribute($url);
 
+			$http = strpos($url, "http");
+			$rel = ($http!==false?" rel='external'":"");
+
 			$result = "<a href=\"$url\"";
 			if ( isset( $this->titles[$link_id] ) ) {
 				$title = $this->titles[$link_id];
@@ -668,7 +672,7 @@ class Markdown_Parser {
 			}
 
 			$link_text = $this->runSpanGamut($link_text);
-			$result .= ">$link_text</a>";
+			$result .= $rel . ">$link_text</a>";
 			$result = $this->hashPart($result);
 		}
 		else {
@@ -684,6 +688,9 @@ class Markdown_Parser {
 
 		$url = $this->encodeAttribute($url);
 
+		$http = strpos($url, "http");
+		$rel = ($http!==false?" rel='external'":"");
+
 		$result = "<a href=\"$url\"";
 		if (isset($title)) {
 			$title = $this->encodeAttribute($title);
@@ -691,7 +698,7 @@ class Markdown_Parser {
 		}
 
 		$link_text = $this->runSpanGamut($link_text);
-		$result .= ">$link_text</a>";
+		$result .= $rel . ">$link_text</a>";
 
 		return $this->hashPart($result);
 	}
@@ -839,7 +846,7 @@ class Markdown_Parser {
 		$text = preg_replace_callback('{
 				^(\#{2,6})	# $1 = string of #\'s
 				[ ]*
-				(.+?)		# $2 = Header text
+				(.+)		# $2 = Header text
 				[ ]*
 				\#*			# optional closing #\'s (not counted)
 				\n+
@@ -1265,9 +1272,9 @@ class Markdown_Parser {
 	function doInfoCallout($text) {
 		$text = preg_replace_callback('/
 			  (								# Wrap whole match in $1
-					^\^
-						(.+)
-					\^$
+					^\^[ ]?
+						((.+\n?)+)
+					[ ]?\^
 			  )
 			/xm',
 			array(&$this, '_doInfoCallout_callback'), $text);
@@ -1297,9 +1304,9 @@ class Markdown_Parser {
 	function doWarningCallout($text) {
 		$text = preg_replace_callback('/
 			  (								# Wrap whole match in $1
-					^%
-						(.+)
-					%$
+					^%[ ]?
+						((.+\n?)+)
+					[ ]?%\n
 			  )
 			/xm',
 			array(&$this, '_doWarningCallout_callback'), $text);
@@ -1329,11 +1336,9 @@ class Markdown_Parser {
 	function doExampleCallout($text) {
 		$text = preg_replace_callback('/
 			  (								# Wrap whole match in $1
-					^\$E
-						\n
-							(.+)
-						\n
-					\$E$
+					^\$E[ \n]?
+						((.+\n?)+)
+					\$E
 			  )
 			/xm',
 			array(&$this, '_doExampleCallout_callback'), $text);
@@ -1363,9 +1368,9 @@ $bq = $this->runBlockGamut($bq);		# recurse
 	function doAnswerCallout($text) {
 		$text = preg_replace_callback('/
 			  (								# Wrap whole match in $1
-					^\$!
-						(.+)
-					\$!$
+					^\$![ ]?
+						((.+\n?)+)
+					[ ]?\$!
 			  )
 			/xm',
 			array(&$this, '_doAnswerCallout_callback'), $text);
@@ -1374,7 +1379,7 @@ $bq = $this->runBlockGamut($bq);		# recurse
 	}
 	function _doAnswerCallout_callback($matches) {
 		$bq = $matches[1];
-
+// print_r($matches);
 		# trim one level of quoting - trim whitespace-only lines
 		$bq = preg_replace('/^\$!|\$!$/', '', $bq);
 		$bq = $this->runBlockGamut($bq);		# recurse
@@ -2593,6 +2598,9 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			$url = $this->urls[$link_id];
 			$url = $this->encodeAttribute($url);
 
+			$http = preg_match('/https?:/',$url,$matches);
+			$rel = ($http!==0?" rel='external'":"");
+
 			$result = "<a href=\"$url\"";
 			if ( isset( $this->titles[$link_id] ) ) {
 				$title = $this->titles[$link_id];
@@ -2603,7 +2611,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 				$result .= $this->ref_attr[$link_id];
 
 			$link_text = $this->runSpanGamut($link_text);
-			$result .= ">$link_text</a>";
+			$result .= $rel . ">$link_text</a>";
 			$result = $this->hashPart($result);
 		}
 		else {
@@ -2620,6 +2628,8 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 
 
 		$url = $this->encodeAttribute($url);
+		$http = preg_match('/https?:/',$url,$matches);
+		$rel = ($http!==0?" rel='external'":"");
 
 		$result = "<a href=\"$url\"";
 		if (isset($title)) {
@@ -2629,7 +2639,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 		$result .= $attr;
 
 		$link_text = $this->runSpanGamut($link_text);
-		$result .= ">$link_text</a>";
+		$result .= $rel . ">$link_text</a>";
 
 		return $this->hashPart($result);
 	}
@@ -2642,6 +2652,8 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 
 
 		$url = $this->encodeAttribute($url);
+		$http = preg_match('/https?:/',$url,$matches);
+		$rel = ($http!==0?" rel='external'":"");
 
 		$result = "<div class=\"form-download\"><p><a href=\"$url\"";
 		if (isset($title)) {
@@ -2651,7 +2663,10 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 		$result .= $attr;
 
 		$link_text = $this->runSpanGamut($link_text);
-		$result .= ">$link_text</a></p></div>";
+		preg_match('/[ ]?\(.+\)$/', $link_text, $file_info_matches);
+		$file_info = $file_info_matches[0];
+		$link_text = str_replace($file_info, "", $link_text);
+		$result .= $rel . ">$link_text</a>$file_info</p></div>";
 
 		return $this->hashPart($result);
 	}
@@ -2769,7 +2784,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 	# Redefined to add id and class attribute support.
 	#
 		# Setext-style headers:
-		#	  Header 1  {#header1}
+		#	  Header 1  {#header1} - removed
 		#	  ========
 		#
 		#	  Header 2  {#header2 .class1 .class2}
@@ -2784,16 +2799,16 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			array(&$this, '_doHeaders_callback_setext'), $text);
 
 		# atx-style headers:
-		#	# Header 1        {#header1}
+		#	# Header 1        {#header1} - removed
 		#	## Header 2       {#header2}
 		#	## Header 2 with closing hashes ##  {#header3.class1.class2}
 		#	...
 		#	###### Header 6   {.class2}
 		#
 		$text = preg_replace_callback('{
-				^(\#{2,6})	# $1 = string of #\'s
+				(\#{2,6})	# $1 = string of #\'s
 				[ ]*
-				(.+?)		# $2 = Header text
+				(.+)		# $2 = Header text
 				[ ]*
 				\#*			# optional closing #\'s (not counted)
 				(?:[ ]+ '.$this->id_class_attr_catch_re.' )?	 # $3 = id/class attributes
