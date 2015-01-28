@@ -49,7 +49,6 @@ define( 'MARKDOWNEXTRA_VERSION',  "1.2.8" ); # 29 Nov 2013
 @define( 'MARKDOWN_PARSER_CLASS',  'MarkdownExtra_Parser' );
 
 function Markdown($text) {
-	echo($text);exit;
 #
 # Initialize the parser and return the result of its transform method.
 #
