@@ -103,7 +103,7 @@ class Markdown_Parser {
 	#
 	# Constructor function. Initialize appropriate member variables.
 	#
-		$this->_initDetab();
+		$this->_initDetab(); 
 		$this->prepareItalicsAndBold();
 
 		$this->nested_brackets_re =
@@ -1465,13 +1465,13 @@ $bq = $this->runBlockGamut($bq);		# recurse
 	}
 
 
-	function formParagraphs($text) {
+	function formParagraphs($text) { 
 	#
 	#	Params:
 	#		$text - string to process with html <p> tags
 	#
 		# Strip leading and trailing lines:
-		$text = preg_replace('/\A\n+|\n+\z/', '', $text);
+		$text = preg_replace('/\A\n+|\n+\z/', '', $text); 
 
 		$grafs = preg_split('/\n{2,}/', $text, -1, PREG_SPLIT_NO_EMPTY);
 
@@ -1483,7 +1483,7 @@ $bq = $this->runBlockGamut($bq);		# recurse
 				# Is a paragraph.
 				$value = $this->runSpanGamut($value);
 				$value = preg_replace('/^([ ]*)/', "<p>", $value);
-				$value .= "</p>";
+				$value .= "</p>"; 
 				$grafs[$key] = $this->unhash($value);
 			}
 			else {
@@ -2100,7 +2100,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 							'.$this->clean_tags_re.'        	|
 							(?!\s)'.$enclosing_tag_re.'
 						)
-						(?:
+		 				(?:
 							(?=[\s"\'/a-zA-Z0-9])	# Allowed characters after tag name.
 							(?>
 								".*?"		|	# Double quotes (can contain `>`)
@@ -3199,7 +3199,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			$is_p = !preg_match('/^B\x1A[0-9]+B|^C\x1A[0-9]+C$/', $value);
 
 			if ($is_p) {
-				$value = "<p>$value</p>";
+				$value = "<p>$value</p>"; 
 			}
 			$grafs[$key] = $value;
 		}

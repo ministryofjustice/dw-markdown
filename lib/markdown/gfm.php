@@ -91,7 +91,7 @@ class WPCom_GHF_Markdown_Parser extends MarkdownExtra_Parser {
 		}
 
 		// escape line-beginning # chars that do not have a space after them.
-		$text = preg_replace_callback( '|^#{1,6}( )?|um', array( $this, '_doEscapeForHashWithoutSpacing' ), $text );
+		$text = preg_replace_callback( '|^#{1,6}( )|um', array( $this, '_doEscapeForHashWithoutSpacing' ), $text );
 
 		// run through core Markdown
 		$text = parent::transform( $text );
