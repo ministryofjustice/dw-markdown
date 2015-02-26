@@ -103,7 +103,7 @@ class Markdown_Parser {
 	#
 	# Constructor function. Initialize appropriate member variables.
 	#
-		$this->_initDetab(); 
+		$this->_initDetab();
 		$this->prepareItalicsAndBold();
 
 		$this->nested_brackets_re =
@@ -565,7 +565,7 @@ class Markdown_Parser {
 			array(&$this, '_doAnchors_reference_callback'), $text);
 
 		#
-		# Next, download links: 
+		# Next, download links:
 		# $D
 		# [link text](url "optional title")
 		# $D
@@ -1286,7 +1286,7 @@ class Markdown_Parser {
 		# trim one level of quoting - trim whitespace-only lines
 		$bq = preg_replace('/^\^|\^$/', '', $bq);
 
-		$bq = preg_replace('/^/m', "  ", $bq); 
+		$bq = preg_replace('/^/m', "  ", $bq);
 		# These leading spaces cause problem with <pre> content,
 		# so we need to fix that:
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
@@ -1318,7 +1318,7 @@ class Markdown_Parser {
 		# trim one level of quoting - trim whitespace-only lines
 		$bq = preg_replace('/^%|%$/', '', $bq);
 
-		$bq = preg_replace('/^/m', "  ", $bq); 
+		$bq = preg_replace('/^/m', "  ", $bq);
 		# These leading spaces cause problem with <pre> content,
 		# so we need to fix that:
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
@@ -1350,7 +1350,7 @@ class Markdown_Parser {
 		# trim one level of quoting - trim whitespace-only lines
 		$bq = preg_replace('/^\$E|\$E$/', '', $bq);
 $bq = $this->runBlockGamut($bq);		# recurse
-		$bq = preg_replace('/^/m', "  ", $bq); 
+		$bq = preg_replace('/^/m', "  ", $bq);
 		# These leading spaces cause problem with <pre> content,
 		# so we need to fix that:
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
@@ -1382,7 +1382,7 @@ $bq = $this->runBlockGamut($bq);		# recurse
 		# trim one level of quoting - trim whitespace-only lines
 		$bq = preg_replace('/^\$!|\$!$/', '', $bq);
 		$bq = $this->runBlockGamut($bq);		# recurse
-		$bq = preg_replace('/^/m', "  ", $bq); 
+		$bq = preg_replace('/^/m', "  ", $bq);
 		# These leading spaces cause problem with <pre> content,
 		# so we need to fix that:
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
@@ -1416,7 +1416,7 @@ $bq = $this->runBlockGamut($bq);		# recurse
 		# trim one level of quoting - trim whitespace-only lines
 		$bq = preg_replace('/^\$C|\$C$/', '', $bq);
 		$bq = $this->runBlockGamut($bq);		# recurse
-		$bq = preg_replace('/^/m', "  ", $bq); 
+		$bq = preg_replace('/^/m', "  ", $bq);
 		# These leading spaces cause problem with <pre> content,
 		# so we need to fix that:
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
@@ -1450,7 +1450,7 @@ $bq = $this->runBlockGamut($bq);		# recurse
 		# trim one level of quoting - trim whitespace-only lines
 		$bq = preg_replace('/^\$A|\$A$/', '', $bq);
 		$bq = $this->runBlockGamut($bq);		# recurse
-		$bq = preg_replace('/^/m', "  ", $bq); 
+		$bq = preg_replace('/^/m', "  ", $bq);
 		# These leading spaces cause problem with <pre> content,
 		# so we need to fix that:
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
@@ -1465,13 +1465,13 @@ $bq = $this->runBlockGamut($bq);		# recurse
 	}
 
 
-	function formParagraphs($text) { 
+	function formParagraphs($text) {
 	#
 	#	Params:
 	#		$text - string to process with html <p> tags
 	#
 		# Strip leading and trailing lines:
-		$text = preg_replace('/\A\n+|\n+\z/', '', $text); 
+		$text = preg_replace('/\A\n+|\n+\z/', '', $text);
 
 		$grafs = preg_split('/\n{2,}/', $text, -1, PREG_SPLIT_NO_EMPTY);
 
@@ -1483,7 +1483,7 @@ $bq = $this->runBlockGamut($bq);		# recurse
 				# Is a paragraph.
 				$value = $this->runSpanGamut($value);
 				$value = preg_replace('/^([ ]*)/', "<p>", $value);
-				$value .= "</p>"; 
+				$value .= "</p>";
 				$grafs[$key] = $this->unhash($value);
 			}
 			else {
@@ -2948,9 +2948,11 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			# Parsing span elements, including code spans, character escapes,
 			# and inline HTML tags, so that pipes inside those gets ignored.
 			$row = $this->parseSpan($row);
+			$row	= preg_replace('/!!!/', '<br>', $row);
 
 			# Split row by cell.
 			$row_cells = preg_split('/ *[|] */', $row, $col_count);
+			# Replace !!! with <br>
 			$row_cells = array_pad($row_cells, $col_count, '');
 
 			$text .= "<tr>\n";
@@ -3199,7 +3201,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 			$is_p = !preg_match('/^B\x1A[0-9]+B|^C\x1A[0-9]+C$/', $value);
 
 			if ($is_p) {
-				$value = "<p>$value</p>"; 
+				$value = "<p>$value</p>";
 			}
 			$grafs[$key] = $value;
 		}
