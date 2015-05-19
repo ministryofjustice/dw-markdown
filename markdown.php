@@ -4,7 +4,7 @@
  * Plugin Name: DW Markdown
  * Description: Write posts or pages in plain-text Markdown syntax.
  * Author: Ryan Jarrett
- * Version: 0.1.1
+ * Version: 0.2
  * Author URI: http://sparkdevelopment.co.uk
  * Text Domain: jetpack
  * Domain Path: /languages/
@@ -21,7 +21,26 @@
  */
 
 include_once dirname( __FILE__ ) . '/require-lib.php';
-include dirname( __FILE__ ) . '/markdown/easy-markdown.php';
+include_once dirname( __FILE__ ) . '/markdown/easy-markdown.php';
+include_once dirname( __FILE__ ) . '/markdown-preview.php';
+
+/**
+ * Force plugin to load early
+ *
+ * @since 1.0
+ */
+
+function DWMDP_load_last(){
+  $path = str_replace( WP_PLUGIN_DIR . '/', '', __FILE__ );
+  if ( $plugins = get_option( 'active_plugins' ) ) {
+    if ( $key = array_search( $path, $plugins ) ) {
+      array_splice( $plugins, $key, 1 );
+      array_push( $plugins, $path );
+      update_option( 'active_plugins', $plugins );
+    }
+  }
+}
+add_action( 'activated_plugin', 'DWMDP_load_last',1 );
 
 // If the module is active, let's make this active for posting, period.
 // Comments will still be optional.
