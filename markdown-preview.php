@@ -45,6 +45,7 @@
         if (class_exists('WPCom_Markdown')) {
           add_action( 'admin_enqueue_scripts', array($this,'DWMDP_scripts') );
           add_filter( 'the_editor', array($this,'add_preview'), 0, 1 );
+          add_action( 'wp_ajax_preview_shortcodes', array($this,'preview_shortcodes') );
         } else {
           // JP Markdown not active
           // add_action( 'admin_notices', array($this,'DWMDP_deactivated') );
@@ -70,6 +71,13 @@
         $html .= "});";
         $html .= "</script>";
         return $html;
+      }
+
+      public function preview_shortcodes() {
+        $html = $_POST['html'];
+        $html = do_shortcode($html);
+        echo $html;
+        wp_die();
       }
 
       public function DWMDP_scripts($hook) {

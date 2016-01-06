@@ -20,7 +20,13 @@ jQuery(function($) {
   var updatePreview = function() {
     var txt = $editableContent.val();
     var html = converter.makeHtml(txt);
-    $preview.contents().find('body').html(html);
+    $.post(ajaxurl, {
+        'action': 'preview_shortcodes',
+        'html': html
+      }, function(response) {
+        $preview.contents().find('body').html(response);
+      }
+    );
   }
 
   //init
