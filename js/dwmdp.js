@@ -29,8 +29,10 @@ jQuery(function($) {
     );
   }
 
+
   //init
   togglePreview();
   $editableContent.keyup(updatePreview);
   $contentViewTabs.click(togglePreview);
+  setInterval(function(){updatePreview()},1000);
 });
