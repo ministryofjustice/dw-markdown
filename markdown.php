@@ -4,7 +4,7 @@
  * Plugin Name: DW Markdown
  * Description: Write posts or pages in plain-text Markdown syntax.
  * Author: Ryan Jarrett
- * Version: 0.2
+ * Version: 0.3
  * Author URI: http://sparkdevelopment.co.uk
  * Text Domain: jetpack
  * Domain Path: /languages/
@@ -22,7 +22,6 @@
 
 include_once dirname( __FILE__ ) . '/require-lib.php';
 include_once dirname( __FILE__ ) . '/markdown/easy-markdown.php';
-include_once dirname( __FILE__ ) . '/markdown-preview.php';
 
 /**
  * Force plugin to load early
