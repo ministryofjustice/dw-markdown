@@ -429,14 +429,15 @@ class WPCom_Markdown {
 		}
 		// rejigger post_content and post_content_filtered
 		// revisions are already in the right place, except when we're restoring, but that's taken care of elsewhere
+
 		// prevent quick edit feature from overriding already-saved markdown (issue https://github.com/Automattic/jetpack/issues/636)
-      if ( 'revision' !== $post_data['post_type'] && ! isset( $_POST['_inline_edit'] ) )
+    if ( 'revision' !== $post_data['post_type'] && ! isset( $_POST['_inline_edit'] ) )
 		{
 			$post_data['post_content_filtered'] = apply_filters( 'wpcom_untransformed_content', $post_data['post_content'] );
 			$post_data['post_content'] = $this->transform( $post_data['post_content'], array( 'id' => $post_id ) );
 			$post_data['post_content'] = apply_filters( 'content_save_pre', $post_data['post_content'] );
 		}
-			elseif ( 0 === strpos( $post_data['post_name'], $post_data['post_parent'] . '-autosave' ) ) 
+	  elseif ( 0 === strpos( $post_data['post_name'], $post_data['post_parent'] . '-autosave' ) ) 
 		{
 			// autosaves for previews are weird
 			$post_data['post_content'] = $this->transform( $post_data['post_content'], array( 'id' => $post_data['post_parent'] ) );
